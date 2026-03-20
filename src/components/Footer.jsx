@@ -1,36 +1,77 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const institutions = [
-  { name: '금융위원회', url: 'https://www.fsc.go.kr', abbr: '금융위' },
-  { name: '금융감독원', url: 'https://www.fss.or.kr', abbr: '금감원' },
-  { name: '신용회복위원회', url: 'https://www.ccrs.or.kr', abbr: '신복위' },
-  { name: '한국대부금융협회', url: 'https://www.clfa.or.kr', abbr: '대부협회' },
-  { name: 'NICE지키미', url: 'https://www.credit.co.kr', abbr: 'NICE' },
+  {
+    name: '금융위원회',
+    url: 'https://www.fsc.go.kr',
+    abbr: '금융위원회',
+    logo: 'https://www.google.com/s2/favicons?domain=fsc.go.kr&sz=128',
+  },
+  {
+    name: '금융감독원',
+    url: 'https://www.fss.or.kr',
+    abbr: '금융감독원',
+    logo: 'https://www.google.com/s2/favicons?domain=fss.or.kr&sz=128',
+  },
+  {
+    name: '신용회복위원회',
+    url: 'https://www.ccrs.or.kr',
+    abbr: '신용회복위원회',
+    logo: 'https://www.ccrs.or.kr/type/www/images/logo/logo.svg',
+  },
+  {
+    name: '한국대부금융협회',
+    url: 'https://www.clfa.or.kr',
+    abbr: 'CLFA',
+    logo: 'https://www.clfa.or.kr/images/logo.png',
+  },
+  {
+    name: 'NICE지키미',
+    url: 'https://www.credit.co.kr',
+    abbr: 'NICE지키미',
+    logo: 'https://img.credit.co.kr/resource/img/zkm/rzm/common/logo/logo_a11y.png',
+  },
 ];
+
+function InstitutionLogo({ inst }) {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  return (
+    <a
+      href={inst.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex flex-col items-center gap-2 group"
+      title={inst.name}
+    >
+      <div className="w-20 h-20 bg-white rounded-xl border border-gray-200 flex items-center justify-center p-2 group-hover:border-[#1a5fd1] group-hover:shadow-md transition-all duration-200">
+        {!imgFailed ? (
+          <img
+            src={inst.logo}
+            alt={inst.name}
+            className="w-full h-full object-contain"
+            onError={() => setImgFailed(true)}
+          />
+        ) : (
+          <span className="text-xs font-bold text-gray-500 text-center leading-tight px-1">{inst.abbr}</span>
+        )}
+      </div>
+      <span className="text-sm text-gray-600 group-hover:text-[#1a5fd1] transition-colors text-center font-medium">{inst.name}</span>
+    </a>
+  );
+}
 
 function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Institution logos bar */}
-      <div className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
+      <div className="bg-gray-50 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-wrap items-start justify-center gap-8 md:gap-14">
             {institutions.map((inst) => (
-              <a
-                key={inst.name}
-                href={inst.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center gap-1 group"
-                title={inst.name}
-              >
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-blue-50 transition-colors border border-gray-200">
-                  <span className="text-[10px] font-bold text-gray-600 text-center leading-tight px-1">{inst.abbr}</span>
-                </div>
-                <span className="text-[11px] text-gray-500 group-hover:text-[#1a5fd1] transition-colors text-center">{inst.name}</span>
-              </a>
+              <InstitutionLogo key={inst.name} inst={inst} />
             ))}
           </div>
         </div>
