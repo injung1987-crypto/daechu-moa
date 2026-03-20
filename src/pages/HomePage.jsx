@@ -2,21 +2,43 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import { Search, Users, Building2, MessageCircle, AlertTriangle, Shield, FileCheck } from 'lucide-react';
+import { Search, Users, Building2, MessageCircle, AlertTriangle, Shield, FileCheck, Plus, ChevronRight, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CompanyCard from '@/components/CompanyCard.jsx';
 import { companiesData, regions, loanProducts } from '@/constants/companiesData.js';
+import { postsData } from '@/constants/postsData.js';
+
+const TODAY = '2026-03-20';
+const NEW_CUTOFF = '2026-03-13';
+
+function isNew(date) {
+  return date >= NEW_CUTOFF;
+}
+
+function formatDate(date) {
+  return date.replace(/-/g, '. ');
+}
 
 function HomePage() {
-  const [selectedRegion, setSelectedRegion] = useState("전체");
-  const [selectedProduct, setSelectedProduct] = useState("전체");
+  const [selectedRegion, setSelectedRegion] = useState('전체');
+  const [selectedProduct, setSelectedProduct] = useState('전체');
 
   const featuredCompanies = companiesData.filter(c => c.featured);
 
+  const tipPosts = postsData.filter(p => p.category === 'info').sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+  const newsPosts = postsData.filter(p => p.category === 'news').sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  const noticePosts = postsData.filter(p => ['caution', 'industry'].includes(p.category)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  const faqPosts = postsData.filter(p => p.category === 'faq').sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+
+  const infoCount = postsData.filter(p => p.category === 'info').length;
+  const newsCount = postsData.filter(p => p.category === 'news').length;
+  const noticeCount = postsData.filter(p => ['caution', 'industry'].includes(p.category)).length;
+  const faqCount = postsData.filter(p => p.category === 'faq').length;
+
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (selectedRegion !== "전체") params.set('region', selectedRegion);
-    if (selectedProduct !== "전체") params.set('product', selectedProduct);
+    if (selectedRegion !== '전체') params.set('region', selectedRegion);
+    if (selectedProduct !== '전체') params.set('product', selectedProduct);
     window.location.href = `/companies?${params.toString()}`;
   };
 
@@ -28,16 +50,16 @@ function HomePage() {
       </Helmet>
 
       <div className="min-h-screen">
-        <section 
+
+        {/* Hero */}
+        <section
           className="relative min-h-[100dvh] flex items-center justify-center bg-cover bg-center"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1697638164340-6c5fc558bdf2)',
-          }}
+          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1697638164340-6c5fc558bdf2)' }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900/80"></div>
-          
+
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -46,8 +68,8 @@ function HomePage() {
             >
               내 조건에 맞는 대출업체,<br />한번에 찾기
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -56,7 +78,7 @@ function HomePage() {
               전국 등록 대출업체 실시간 연결
             </motion.p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -64,9 +86,7 @@ function HomePage() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-left text-sm font-semibold text-gray-700 mb-2">
-                    지역 선택
-                  </label>
+                  <label className="block text-left text-sm font-semibold text-gray-700 mb-2">지역 선택</label>
                   <select
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value)}
@@ -79,9 +99,7 @@ function HomePage() {
                 </div>
 
                 <div>
-                  <label className="block text-left text-sm font-semibold text-gray-700 mb-2">
-                    대출상품 선택
-                  </label>
+                  <label className="block text-left text-sm font-semibold text-gray-700 mb-2">대출상품 선택</label>
                   <select
                     value={selectedProduct}
                     onChange={(e) => setSelectedProduct(e.target.value)}
@@ -105,28 +123,198 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="bg-gray-100 py-6">
+        {/* Stats Bar */}
+        <section className="bg-gray-100 py-5 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap justify-center gap-8 text-center">
               <div className="flex items-center gap-2">
-                <Users className="text-[#1a5fd1]" size={24} />
+                <Users className="text-[#1a5fd1]" size={22} />
                 <span className="text-gray-700 font-medium">오늘 방문자: <strong className="text-gray-900">1,284명</strong></span>
               </div>
               <div className="flex items-center gap-2">
-                <Building2 className="text-[#1a5fd1]" size={24} />
-                <span className="text-gray-700 font-medium">누적 업체수: <strong className="text-gray-900">320개</strong></span>
+                <Building2 className="text-[#1a5fd1]" size={22} />
+                <span className="text-gray-700 font-medium">등록 업체수: <strong className="text-gray-900">{companiesData.length}개</strong></span>
               </div>
               <div className="flex items-center gap-2">
-                <MessageCircle className="text-[#1a5fd1]" size={24} />
+                <MessageCircle className="text-[#1a5fd1]" size={22} />
                 <span className="text-gray-700 font-medium">누적 상담수: <strong className="text-gray-900">12,400건</strong></span>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-white">
+        {/* Board Overview */}
+        <section className="py-8 bg-gray-50 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12" style={{ textBalance: 'balance' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+              {/* Left: 금융TIP (tall) */}
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+                  <h3 className="font-bold text-gray-900 text-base">
+                    금융TIP <span className="text-[#f5a623] font-bold">{infoCount}건</span>
+                  </h3>
+                </div>
+                <ul className="flex-1 divide-y divide-gray-100">
+                  {tipPosts.map(post => (
+                    <li key={post.id}>
+                      <Link to={`/posts/${post.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
+                        <span className="flex items-center gap-1.5 text-sm text-gray-700 min-w-0">
+                          <span className="text-gray-400 flex-shrink-0">·</span>
+                          <span className="truncate">{post.title}</span>
+                          {isNew(post.date) && (
+                            <span className="flex-shrink-0 bg-[#f5a623] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">N</span>
+                          )}
+                        </span>
+                        <span className="flex-shrink-0 text-xs text-gray-400 ml-3">{formatDate(post.date)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/posts?category=info"
+                  className="flex items-center justify-between px-5 py-4 bg-[#f5a623] hover:bg-[#e09615] text-white font-bold text-sm transition-colors"
+                >
+                  <span>금융TIP 더보기</span>
+                  <Plus size={18} />
+                </Link>
+              </div>
+
+              {/* Middle: 금융뉴스 + 공지사항 */}
+              <div className="flex flex-col gap-5">
+                {/* 금융뉴스 */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+                    <h3 className="font-bold text-gray-900 text-base">
+                      금융뉴스 <span className="text-[#f5a623] font-bold">{newsCount}건</span>
+                    </h3>
+                    <Link to="/posts?category=news" className="text-gray-400 hover:text-[#1a5fd1] transition-colors">
+                      <Plus size={18} />
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-gray-100">
+                    {newsPosts.map(post => (
+                      <li key={post.id}>
+                        <Link to={`/posts/${post.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
+                          <span className="flex items-center gap-1.5 text-sm text-gray-700 min-w-0">
+                            <span className="text-gray-400 flex-shrink-0">·</span>
+                            <span className="truncate">{post.title}</span>
+                            {isNew(post.date) && (
+                              <span className="flex-shrink-0 bg-[#f5a623] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">N</span>
+                            )}
+                          </span>
+                          <span className="flex-shrink-0 text-xs text-gray-400 ml-3">{formatDate(post.date)}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 공지사항 */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+                    <h3 className="font-bold text-gray-900 text-base">
+                      공지사항 <span className="text-[#f5a623] font-bold">{noticeCount}건</span>
+                    </h3>
+                    <Link to="/posts?category=caution" className="text-gray-400 hover:text-[#1a5fd1] transition-colors">
+                      <Plus size={18} />
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-gray-100">
+                    {noticePosts.map(post => (
+                      <li key={post.id}>
+                        <Link to={`/posts/${post.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
+                          <span className="flex items-center gap-1.5 text-sm text-gray-700 min-w-0">
+                            <span className="text-gray-400 flex-shrink-0">·</span>
+                            <span className="truncate">{post.title}</span>
+                            {isNew(post.date) && (
+                              <span className="flex-shrink-0 bg-[#f5a623] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">N</span>
+                            )}
+                          </span>
+                          <span className="flex-shrink-0 text-xs text-gray-400 ml-3">{formatDate(post.date)}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Right: 질문과답변 + 바로가기 */}
+              <div className="flex flex-col gap-5">
+                {/* 질문과답변 */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+                    <h3 className="font-bold text-gray-900 text-base">
+                      질문과답변 <span className="text-[#f5a623] font-bold">{faqCount}건</span>
+                    </h3>
+                    <Link to="/posts?category=faq" className="text-gray-400 hover:text-[#1a5fd1] transition-colors">
+                      <Plus size={18} />
+                    </Link>
+                  </div>
+                  <ul className="divide-y divide-gray-100">
+                    {faqPosts.map(post => (
+                      <li key={post.id}>
+                        <Link to={`/posts/${post.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
+                          <span className="flex items-center gap-1.5 text-sm text-gray-700 min-w-0">
+                            <span className="text-gray-400 flex-shrink-0">·</span>
+                            <span className="truncate">{post.title}</span>
+                            {isNew(post.date) && (
+                              <span className="flex-shrink-0 bg-[#f5a623] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">N</span>
+                            )}
+                          </span>
+                          <span className="flex-shrink-0 text-xs text-gray-400 ml-3">{formatDate(post.date)}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 바로가기 */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="px-5 py-3 border-b border-gray-100">
+                    <h3 className="font-bold text-gray-900 text-base">바로가기</h3>
+                  </div>
+                  <div className="flex items-center justify-around px-5 py-6">
+                    <Link to="/register" className="flex flex-col items-center gap-2 text-gray-600 hover:text-[#1a5fd1] transition-colors">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-blue-50 transition-colors">
+                        <Building2 size={22} />
+                      </div>
+                      <span className="text-xs font-medium">광고문의</span>
+                    </Link>
+                    <Link to="/consultation" className="flex flex-col items-center gap-2 text-gray-600 hover:text-[#1a5fd1] transition-colors">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-blue-50 transition-colors">
+                        <MessageCircle size={22} />
+                      </div>
+                      <span className="text-xs font-medium">1:1문의</span>
+                    </Link>
+                    <Link to="/posts?category=faq" className="flex flex-col items-center gap-2 text-gray-600 hover:text-[#1a5fd1] transition-colors">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-blue-50 transition-colors">
+                        <HelpCircle size={22} />
+                      </div>
+                      <span className="text-xs font-medium">자주묻는질문</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Tip Bar */}
+            <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white border border-gray-200 rounded-lg px-5 py-4 gap-3">
+              <div className="flex items-center gap-3">
+                <span className="flex-shrink-0 bg-[#f5a623] text-white text-xs font-bold px-2 py-1 rounded">TIP</span>
+                <p className="text-sm text-gray-700">대출모아에 등록된 업체마다 기준과 상품, 금리, 상환기간이 모두 다르기 때문에 여러 업체와 상담해보시는게 유리합니다.</p>
+              </div>
+              <Link to="/companies" className="flex-shrink-0 text-sm text-gray-600 hover:text-[#1a5fd1] flex items-center gap-1 font-medium whitespace-nowrap">
+                대출모아 이용안내 <ChevronRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Companies */}
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-10" style={{ textBalance: 'balance' }}>
               이달의 추천 업체
             </h2>
 
@@ -143,7 +331,7 @@ function HomePage() {
               ))}
             </div>
 
-            <div className="text-center mt-12">
+            <div className="text-center mt-10">
               <Link
                 to="/companies"
                 className="inline-block bg-[#1a5fd1] hover:bg-[#1552b8] text-white font-semibold px-8 py-3 rounded-lg transition-all duration-200 active:scale-[0.98]"
@@ -154,9 +342,10 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="py-20 bg-gray-50">
+        {/* Quick Search */}
+        <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12" style={{ textBalance: 'balance' }}>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-10" style={{ textBalance: 'balance' }}>
               빠른 검색
             </h2>
 
@@ -164,7 +353,7 @@ function HomePage() {
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900 mb-6">지역별 빠른 검색</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {regions.filter(r => r !== "전체").map((region) => (
+                  {regions.filter(r => r !== '전체').map((region) => (
                     <Link
                       key={region}
                       to={`/companies?region=${region}`}
@@ -179,7 +368,7 @@ function HomePage() {
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900 mb-6">상품별 빠른 검색</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {loanProducts.filter(p => p !== "전체").map((product) => (
+                  {loanProducts.filter(p => p !== '전체').map((product) => (
                     <Link
                       key={product}
                       to={`/companies?product=${product}`}
@@ -194,9 +383,10 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="py-20 bg-blue-50">
+        {/* Safety Warnings */}
+        <section className="py-16 bg-blue-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12" style={{ textBalance: 'balance' }}>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-10" style={{ textBalance: 'balance' }}>
               안전한 이용을 위한 주의사항
             </h2>
 
@@ -245,6 +435,7 @@ function HomePage() {
             </div>
           </div>
         </section>
+
       </div>
     </>
   );
