@@ -11,6 +11,8 @@ import ConsultationPage from './pages/ConsultationPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import TermsPage from './pages/TermsPage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
+import PostsPage from './pages/PostsPage.jsx';
+import PostDetailPage from './pages/PostDetailPage.jsx';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/posts" element={<PostsPage />} />
+        <Route path="/posts/:id" element={<PostDetailPage />} />
         <Route path="*" element={
           <div className="min-h-screen bg-gray-50 pt-24 pb-16 flex items-center justify-center">
             <div className="text-center">

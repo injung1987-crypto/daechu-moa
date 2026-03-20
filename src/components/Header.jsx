@@ -11,6 +11,7 @@ function Header() {
   const navLinks = [
     { name: '지역별대출', path: '/companies?filter=region' },
     { name: '상품별대출', path: '/companies?filter=product' },
+    { name: '금융정보', path: '/posts' },
     { name: '실시간상담', path: '/consultation' },
     { name: '업체찾기', path: '/companies' }
   ];
