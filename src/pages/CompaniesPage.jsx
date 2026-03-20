@@ -12,7 +12,7 @@ function CompaniesPage() {
   const [selectedProduct, setSelectedProduct] = useState(searchParams.get('product') || '전체');
   const [sortBy, setSortBy] = useState('latest');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
   useEffect(() => {
     const region = searchParams.get('region');
@@ -143,19 +143,24 @@ function CompaniesPage() {
                     이전
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
-                        currentPage === page
-                          ? 'bg-[#1a5fd1] text-white'
-                          : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                  {(() => {
+                    const delta = 4;
+                    const start = Math.max(1, currentPage - delta);
+                    const end = Math.min(totalPages, currentPage + delta);
+                    return Array.from({ length: end - start + 1 }, (_, i) => start + i).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium ${
+                          currentPage === page
+                            ? 'bg-[#1a5fd1] text-white'
+                            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ));
+                  })()}
 
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}

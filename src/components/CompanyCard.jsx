@@ -49,7 +49,12 @@ function CompanyCard({ company }) {
           </div>
         </div>
 
-        <p className="text-xs text-gray-400 mb-3">등록번호: {company.registrationNumber}</p>
+        {company.bannerTitle && (
+          <p className="text-sm font-semibold text-[#1a5fd1] mb-1">{company.bannerTitle}</p>
+        )}
+        {company.desc && (
+          <p className="text-xs text-gray-500 mb-3">{company.desc}</p>
+        )}
 
         <div className="flex flex-wrap gap-2 mb-4">
           {company.loanTypes.map((type, index) => (
